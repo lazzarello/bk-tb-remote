@@ -23,9 +23,9 @@ class Req < ActiveRecord::Base
     name
     description
   end
-  named_scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
-  named_scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
-  named_scope :search, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
+  scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
+  scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
+  scope :search, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
 
   has_and_belongs_to_many :categories
   has_and_belongs_to_many :neighborhoods
@@ -161,7 +161,6 @@ class Req < ActiveRecord::Base
   def make_active
     self.active = true
   end
-
 
   def send_req_notifications
     Cheepnis.enqueue(self)
