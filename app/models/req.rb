@@ -4,29 +4,28 @@
 # Table name: reqs
 #
 #  id              :integer(4)      not null, primary key
-#  name            :string(255)     
-#  description     :text            
+#  name            :string(255)
+#  description     :text
 #  estimated_hours :decimal(8, 2)   default(0.0)
-#  due_date        :datetime        
-#  person_id       :integer(4)      
-#  created_at      :datetime        
-#  updated_at      :datetime        
+#  due_date        :datetime
+#  person_id       :integer(4)
+#  created_at      :datetime
+#  updated_at      :datetime
 #  active          :boolean(1)      default(TRUE)
-#  twitter         :boolean(1)      
+#  twitter         :boolean(1)
 #
 
 class Req < ActiveRecord::Base
   include ActivityLogger
-  extend PreferencesHelper 
+  extend PreferencesHelper
 
   index do
     name
     description
   end
-  
-  scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
-  scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
-  scope :search_by, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
+  named_scope :active, :conditions => ["active IS true AND due_date >= ?", DateTime.now]
+  named_scope :with_group_id, lambda {|group_id| {:conditions => ['group_id = ?', group_id]}}
+  named_scope :search, lambda { |text| {:conditions => ["lower(name) LIKE ? OR lower(description) LIKE ?","%#{text}%".downcase,"%#{text}%".downcase]} }
 
   has_and_belongs_to_many :categories
   has_and_belongs_to_many :neighborhoods
@@ -46,7 +45,7 @@ class Req < ActiveRecord::Base
   validate :maximum_categories
 
   before_create :make_active, :if => :biddable
-  after_create :notify_workers, :if => :notifications
+  after_create :send_req_notifications, :if => :notifications
   after_create :log_activity
 
   class << self
@@ -120,6 +119,26 @@ class Req < ActiveRecord::Base
     end
   end
 
+  def perform
+    workers = []
+    # even though pseudo-reqs created by direct payments do not have associated categories, let's
+    # be extra cautious and check for the active property as well
+    #
+    if self.active? && Req.global_prefs.can_send_email? && Req.global_prefs.email_notifications?
+      self.categories.each do |category|
+        workers << category.people
+      end
+
+      workers.flatten!
+      workers.uniq!
+      workers.each do |worker|
+        if worker.active?
+          PersonMailer.deliver_req_notification(self, worker) if worker.connection_notifications?
+        end
+      end
+    end
+  end
+
   private
 
   def maximum_categories
@@ -143,23 +162,8 @@ class Req < ActiveRecord::Base
     self.active = true
   end
 
-  def notify_workers
-    workers = []
-    # even though pseudo-reqs created by direct payments do not have associated categories, let's
-    # be extra cautious and check for the active property as well
-    #
-    if self.active? && Req.global_prefs.can_send_email? && Req.global_prefs.email_notifications?
-      self.categories.each do |category|
-        workers << category.people
-      end
 
-      workers.flatten!
-      workers.uniq!
-      workers.each do |worker|
-        if worker.active?
-          PersonMailer.req_notification(self, worker).deliver if worker.connection_notifications?
-        end
-      end
-    end
+  def send_req_notifications
+    Cheepnis.enqueue(self)
   end
 end
