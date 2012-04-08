@@ -573,7 +573,6 @@ class Person < ActiveRecord::Base
            (email_verified IS NULL OR email_verified = ?)),
          false, true, true]
       end
-
       # Return the conditions for a user to be 'mostly' active.
       def conditions_for_mostly_active
         [%(deactivated = ? AND
