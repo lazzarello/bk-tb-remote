@@ -2,8 +2,7 @@ development:
   adapter: postgresql
   database: oscurrency_development
   hostname: localhost
-  username: postgres
-  password: spindreck
+  username: timebank
   
 test:
   adapter: postgresql
