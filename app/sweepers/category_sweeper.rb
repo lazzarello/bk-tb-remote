@@ -16,7 +16,7 @@ class CategorySweeper < ActionController::Caching::Sweeper
   private
   
   def clear_cache
-    logger.info "category cache sweep"
+    Rails.logger.info "category cache sweep"
     expire_fragment('skillbank')
   end
 end
