@@ -52,10 +52,12 @@ class Person < ActiveRecord::Base
 
 #  attr_accessor :password, :verify_password, :new_password, :password_confirmation
   attr_accessor :sorted_photos, :accept_agreement
+  attr_accessible *attribute_names, :as => :admin
+  attr_accessible :password, :password_confirmation, :as => :admin
   attr_accessible :email, :password, :password_confirmation, :name,
                   :description, :connection_notifications,
-                  :message_notifications, :wall_comment_notifications, :forum_notifications,
-                  :blog_comment_notifications, :category_ids, :address_ids, :neighborhood_ids,
+                  :message_notifications, :forum_notifications,
+                  :category_ids, :address_ids, :neighborhood_ids,
                   :zipcode,
                   :phone, :phoneprivacy,
                   :accept_agreement,
@@ -69,6 +71,8 @@ class Person < ActiveRecord::Base
     description
   end
 
+  scope :active, :conditions => {:active => true}
+  scope :connection_notifications, :conditions => {:connection_notifications => true}
   #is_indexed :fields => [ 'name', 'description', 'deactivated',
   #                        'email_verified'],
   #           :conditions => "deactivated = false AND (email_verified IS NULL OR email_verified = true)"
@@ -83,7 +87,6 @@ class Person < ActiveRecord::Base
   MESSAGES_PER_PAGE = 5
   EXCHANGES_PER_PAGE = 10
   NUM_RECENT_MESSAGES = 3
-  NUM_WALL_COMMENTS = 10
   NUM_RECENT = 8
   FEED_SIZE = 10
   TIME_AGO_FOR_MOSTLY_ACTIVE = 12.months.ago
@@ -99,9 +102,6 @@ class Person < ActiveRecord::Base
                             (email_verified IS NULL OR email_verified = ?)),
                           Connection::REQUESTED, false, true]
 
-  has_one :blog
-  has_many :comments, :as => :commentable, :order => 'created_at DESC',
-                      :limit => NUM_WALL_COMMENTS
   has_many :connections
   has_many :contacts, :through => :connections,
                       :conditions => ACCEPTED_AND_ACTIVE,
@@ -119,7 +119,7 @@ class Person < ActiveRecord::Base
     person.has_many :_sent_exchanges, :foreign_key => "customer_id", :class_name => "Exchange"
     person.has_many :_received_exchanges, :foreign_key => "worker_id", :class_name => "Exchange"
   end
-  has_many :exchanges
+  has_many :exchanges, :foreign_key => "worker_id"
   has_many :feeds
   has_many :activities, :through => :feeds, :order => 'activities.created_at DESC',
                                             :limit => FEED_SIZE,
@@ -136,9 +136,6 @@ class Person < ActiveRecord::Base
   has_many :groups_not_hidden, :through => :memberships, :source => :group,
     :conditions => "status = 0 and mode != 2", :order => "name ASC"
 
-  has_many :events
-  has_many :event_attendees
-  has_many :attendee_events, :through => :event_attendees, :source => :event
   has_many :accounts
   has_many :addresses
   has_many :client_applications
@@ -171,7 +168,6 @@ class Person < ActiveRecord::Base
   # XXX just doing jquery validation
   #validates_acceptance_of :accept_agreement, :accept => true, :message => "Please accept the agreement to complete registration", :on => :create
 
-  before_create :create_blog, :check_config_for_deactivation
   before_create :set_default_group
   after_create :create_address
   after_create :join_mandatory_groups
@@ -323,14 +319,10 @@ class Person < ActiveRecord::Base
   end
 
   def trashed_messages(page = 1)
-    conditions = [%((sender_id = :person AND sender_deleted_at > :t) OR
-                    (recipient_id = :person AND recipient_deleted_at > :t)),
-                  { :person => id, :t => TRASH_TIME_AGO }]
-    order = 'created_at DESC'
-    trashed = Message.paginate(:all, :conditions => conditions,
-                                     :order => order,
-                                     :page => page,
-                                     :per_page => MESSAGES_PER_PAGE)
+    conditions = [%((sender_id = ? AND sender_deleted_at > ?) OR (recipient_id = ? AND recipient_deleted_at > ?)),
+                  id, TRASH_TIME_AGO, id, TRASH_TIME_AGO]
+
+    trashed = Message.where(conditions).paginate(:page => page, :per_page => MESSAGES_PER_PAGE).order('created_at DESC')
   end
 
   def recent_messages
@@ -362,9 +354,7 @@ class Person < ActiveRecord::Base
   end
 
   def current_and_active_reqs
-    today = DateTime.now
-    reqs = self.reqs.find(:all, :conditions => ["biddable = ? AND due_date >= ?", true, today], :order => 'created_at DESC')
-    reqs.delete_if { |req| req.has_approved? }
+    reqs.current.biddable.order('created_at DESC')
   end
 
   def current_and_active_bids
@@ -489,12 +479,12 @@ class Person < ActiveRecord::Base
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
-    PersonMailer.password_reset_instructions(self).deliver
+    after_transaction { PersonMailerQueue.password_reset_instructions(self) }
   end
 
   def deliver_email_verification!
     reset_perishable_token!
-    PersonMailer.email_verification(self).deliver
+    after_transaction { PersonMailerQueue.email_verification(self) }
   end
 
   protected
@@ -573,6 +563,7 @@ class Person < ActiveRecord::Base
            (email_verified IS NULL OR email_verified = ?)),
          false, true, true]
       end
+
       # Return the conditions for a user to be 'mostly' active.
       def conditions_for_mostly_active
         [%(deactivated = ? AND

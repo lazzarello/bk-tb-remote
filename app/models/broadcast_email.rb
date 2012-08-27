@@ -12,13 +12,13 @@
 
 class BroadcastEmail < ActiveRecord::Base
 
-  def perform
+  def spew
     peeps = Person.all_broadcast_email
-    peeps.each do |peep|
-      logger.info("BroadcaseEmail: sending email to #{peep.id}: #{peep.name}")
-      email = BroadcastMailer.create_spew(peep, subject, message)
-      email.set_content_type("text/html")
-      BroadcastMailer.deliver(email)
+    after_transaction do
+      peeps.each do |peep|
+        logger.info("BroadcastEmail: sending email to #{peep.id}: #{peep.name}")
+        BroadcastMailerQueue.spew(peep, subject, message)
+      end
     end
   end
 

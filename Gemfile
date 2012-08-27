@@ -1,4 +1,6 @@
-source 'http://rubygems.org'
+#!/usr/bin/ruby
+
+source :rubygems
 
 gem 'rails', '3.1.3'
 
@@ -6,11 +8,17 @@ gem 'rails', '3.1.3'
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'pg'
+gem "unicorn"
+gem "newrelic_rpm"
+gem "girl_friday"
 
 group :assets do
-  gem "sass-rails"
+  gem "sass-rails", '3.1.5'
   gem "uglifier"
+  gem 'jquery-ui-rails'
 end
+
+gem "audited-activerecord"
 
 gem 'jquery-rails'
 
@@ -22,7 +30,6 @@ gem "chronic"
 gem "feed-normalizer"
 gem "texticle", "1.0.4.20101004123327"
 
-gem "eventmachine"
 gem "aws-s3"
 gem "rmagick", :require => 'RMagick'
 gem "rack-openid"
@@ -39,24 +46,26 @@ gem "oauth-plugin", :path => "#{File.expand_path(__FILE__)}/../vendor/gems/oauth
 gem "cancan"
 gem "dalli"
 gem "redcarpet", "1.17.2"
-#gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :branch => 'rails-3.0'
-#gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git', :ref =>'608ae867438f406bcd96'
-gem 'rails_admin', :git => 'git://github.com/sferik/rails_admin.git'
-gem "delayed_job_active_record"
+gem 'rails_admin'
+gem "ar_after_transaction"
 
 group :development, :test do
+  gem 'sqlite3'
   gem "silent-postgres"
-  gem "test-unit"
-# gem 'ruby-debug19', :require => 'ruby-debug'
-  gem "rspec-rails" # :lib => false unless File.directory?(File.join(Rails.root, 'vendor/plugins/rspec-rails'))
   gem "rack"
   gem "rack-test"
-  gem "database_cleaner"
-  gem "cucumber"
-  gem "cucumber-rails"
   gem "awesome_print"
-  gem "spork"
-  gem "guard-spork"
   gem "artifice"
   gem "opentransact"
+end
+
+group :test do
+  gem "capybara"
+  gem "cucumber"
+  gem "cucumber-rails"
+  gem "database_cleaner"
+  gem "guard-spork"
+  gem "rspec-rails" # :lib => false unless File.directory?(File.join(Rails.root, 'vendor/plugins/rspec-rails'))
+  gem "spork"
+  gem "test-unit"
 end

@@ -25,6 +25,7 @@ class ForumPost < Post
 #              :include => [{:association_name => 'topic', :field => 'name'}]
 
   attr_accessible :body
+  attr_accessible *attribute_names, :as => :admin
   
   belongs_to :topic,  :counter_cache => true, :touch => true
   belongs_to :person, :counter_cache => true
@@ -36,19 +37,11 @@ class ForumPost < Post
   after_create :send_forum_notifications
 
   def send_forum_notifications
-    Cheepnis.enqueue(self)
-  end
-  
-  def perform
-    do_send_forum_notifications
-  end
-
-  def do_send_forum_notifications
     peeps = topic.forum.group.memberships.listening.map {|m| m.person}
-    
-    peeps.each do |peep|
-      logger.info("forum_post: sending email to #{peep.id}: #{peep.name}")
-      PersonMailer.forum_post_notification(peep, self).deliver
+    after_transaction do
+      peeps.each do |peep|
+        PersonMailerQueue.forum_post_notification(peep, self)
+      end
     end
   end
 

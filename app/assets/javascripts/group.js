@@ -227,7 +227,7 @@ $(function() {
       });
     });
 
-  $('.edit_member_preference, #new_bid, .edit_bid, #new_req, #edit_req, #new_offer, #edit_offer, #new_topic, #new_post, #new_exchange, #new_wall_post, #new_message').live('submit',function() {
+  $('.edit_member_preference, #new_bid, .edit_bid, #new_req, #edit_req, #new_offer, #edit_offer, #new_topic, #new_post, #new_exchange, #new_wall_post, #tabs #new_message').live('submit',function() {
       if(OSCURRENCY.post_allowed) {
         OSCURRENCY.post_allowed = false;
         $.post($(this).attr('action'),$(this).serialize(),null,'script');
@@ -273,7 +273,7 @@ $(function() {
     return false;
     });
 
-  $('.pagination a').live('click',function() {
+  $('body.groups .pagination a').live('click',function() {
     str = url2hash(this.href);
     // XXX hack until hash is renamed to match
     str = str.replace(/memberships/,'people');

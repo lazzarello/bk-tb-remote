@@ -1,8 +1,19 @@
 unless Rails.env == 'test'
+require Rails.root.join('lib', 'rails_admin_send_broadcast_email.rb')
 RailsAdmin.config do |config|
+module RailsAdmin
+  module Config
+    module Actions
+      class SendBroadcastEmail < RailsAdmin::Config::Actions::Base
+        RailsAdmin::Config::Actions.register(self)
+      end
+    end
+  end
+end
 
   config.current_user_method { current_person } #auto-generated
   config.authorize_with :cancan
+  config.attr_accessible_role {:admin}
   config.authenticate_with {
     unless current_person
       session[:return_to] = request.url
@@ -10,7 +21,67 @@ RailsAdmin.config do |config|
     end
   }
 
-  config.included_models = [Preference,Exchange,ForumPost,FeedPost,BroadcastEmail,Person,Category,Neighborhood]
+  config.actions do
+    dashboard
+    index
+    new
+    send_broadcast_email
+    show
+    edit
+    delete
+  end
+
+  config.included_models = [Preference,Exchange,ForumPost,FeedPost,BroadcastEmail,Person,Category,Neighborhood,Req,Offer]
+
+  config.model Req do
+    label "Request" 
+    label_plural "Requests"
+    list do
+      field :name
+      field :person do
+        label "requested by"
+        formatted_value do
+          value.name
+        end
+      end
+      field :created_at
+    end
+
+    edit do
+      field :group
+      field :person
+      field :name
+      field :estimated_hours
+      field :due_date, :date
+      field :description
+      field :categories
+      field :neighborhoods
+    end
+  end
+
+  config.model Offer do
+    list do
+      field :name
+      field :person do
+        label "offered by"
+        formatted_value do
+          value.name
+        end
+      end
+      field :created_at
+    end
+
+    edit do
+      field :group
+      field :person
+      field :name
+      field :total_available
+      field :expiration_date, :date
+      field :description
+      field :categories
+      field :neighborhoods
+    end
+  end
 
   config.model Preference do
     list do
@@ -19,13 +90,8 @@ RailsAdmin.config do |config|
 
     edit do
       field :app_name
-      field :domain
       field :server_name
-      field :smtp_server
-      field :smtp_port do
-        properties[:collection] = [['587','587'],['25','25']]
-        partial "select"
-      end
+      field :groups
       field :default_group_id do
         properties[:collection] = Group.all.map {|g| [g.name,g.id]}
         partial "select"
@@ -160,6 +226,8 @@ RailsAdmin.config do |config|
     edit do
       field :name
       field :email
+      field :password
+      field :password_confirmation
       field :deactivated
       field :email_verified
       field :phone

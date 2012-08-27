@@ -1,21 +1,25 @@
 class BroadcastMailer < ActionMailer::Base
-  extend PreferencesHelper 
-  
+  extend PreferencesHelper
+  include CoreHelper
+
   def spew(person, subject, message, sent_at = Time.now)
-    subject    formatted_subject(subject)
-    recipients person.email
-    from       "Time Exchange Notes <notes@#{domain}>"
-    sent_on    sent_at
-    
-    body       "message" => message,
-               "person" => person,
-               "preferences_note" => preferences_note(person)
+    person = coerce(person, Person)
+    message = coerce(message, Message)
+    @message = message
+    @person = person
+    @preferences_note = preferences_note(person)
+
+    mail(
+      :to => person.email,
+      :from => "Community Exchange Notes <notes@#{domain}>",
+      :subject => formatted_subject(subject)
+    )
   end
 
 private
 
     def domain
-      @domain ||= BroadcastMailer.global_prefs.domain
+      @domain ||= (ENV['SMTP_DOMAIN'] || ENV['DOMAIN'])
     end
 
     def server

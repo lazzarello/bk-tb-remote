@@ -12,7 +12,7 @@ class Membership < ActiveRecord::Base
   belongs_to :group
   belongs_to :person
   has_one :member_preference
-  has_many :activities, :foreign_key => "item_id", :conditions => "item_type = 'Membership'" #, :dependent => :destroy
+  has_many :activities, :as => :item #, :dependent => :destroy
 
   validates_presence_of :person_id, :group_id
   after_create :create_member_preference
@@ -105,14 +105,14 @@ class Membership < ActiveRecord::Base
             create(:person => person, :group => group, :status => PENDING)
             if send_mail
               membership = person.memberships.find(:first, :conditions => ['group_id = ?',group])
-              PersonMailer.membership_request(membership).deliver
+              after_transaction { PersonMailerQueue.membership_request(membership) }
             end
           end
           if group.public?
             Membership.accept(person,group)
             if send_mail
               membership = person.memberships.find(:first, :conditions => ['group_id = ?',group])
-              PersonMailer.membership_public_group(membership).deliver
+              after_transaction { PersonMailerQueue.membership_public_group(membership) }
             end
           end
         end

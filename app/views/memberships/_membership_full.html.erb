@@ -20,7 +20,7 @@
           <%= link_to t('people.show.edit_it'), edit_person_path(@person) %>
         </div>
       <%- end -%>
-      <%- if Person::DEFAULT_ZIPCODE_STRING == current_person.address.zipcode_plus_4 %>
+      <%- if current_person.address && Person::DEFAULT_ZIPCODE_STRING == current_person.address.zipcode_plus_4 %>
         <div class="error">
           <%= link_to t('people.show.update_location'),
                       edit_person_path(@person) %>. 
@@ -72,10 +72,6 @@
       <%- end -%>
     <%- end -%>
     <%= markdown(@person.description) %>
-  </div>
-
-  <div id="wall_canvas">
-    <%= render :partial => '/shared/wall' %>
   </div>
   <%- if @membership.group.adhoc_currency? -%>
     <%= render :partial => '/shared/recent_exchanges', :locals => {:group => @account.group} %>

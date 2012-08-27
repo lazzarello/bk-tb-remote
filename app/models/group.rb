@@ -1,5 +1,6 @@
 class Group < ActiveRecord::Base
   include ActivityLogger
+  extend PreferencesHelper
   
   validates_presence_of :name, :person_id
   attr_protected :mandatory
@@ -17,7 +18,7 @@ class Group < ActiveRecord::Base
   
   belongs_to :owner, :class_name => "Person", :foreign_key => "person_id"
   
-  has_many :activities, :foreign_key => "item_id", :conditions => "item_type = 'Group'", :dependent => :destroy
+  has_many :activities, :as => :item, :dependent => :destroy
 
   validates_uniqueness_of :name
   validates_uniqueness_of :unit, :allow_nil => true
@@ -30,12 +31,24 @@ class Group < ActiveRecord::Base
   before_update :update_member_credit_limits
   
   index do 
-    name description
+    name 
+    description
   end
   
   # GROUP modes
   PUBLIC = 0
   PRIVATE = 1
+  
+  def get_groups_modes
+    modes = []
+    modes << ["Public",PUBLIC]
+    modes << ["Membership approval required",PRIVATE] unless default_group?
+    return modes
+  end
+
+  def default_group?
+    id == Group.global_prefs.default_group_id
+  end
   
   class << self
 

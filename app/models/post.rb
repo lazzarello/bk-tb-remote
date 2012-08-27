@@ -16,6 +16,10 @@
 
 class Post < ActiveRecord::Base
   include ActivityLogger
-  has_many :activities, :foreign_key => "item_id", :conditions => "item_type = 'Post'", :dependent => :destroy
+  has_many :activities, :as => :item, :dependent => :destroy
   attr_accessible nil
+
+  index do
+    body
+  end
 end
