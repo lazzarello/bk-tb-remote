@@ -303,7 +303,6 @@ DEPENDENCIES
   cucumber-rails
   dalli
   database_cleaner
-  delayed_job_active_record
   dynamic_form
   feed-normalizer
   girl_friday

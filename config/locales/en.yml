@@ -292,7 +292,7 @@ en:
       respond: "Respond"
       no_invitations: "No invitations (yet)"
     new:
-      header: "Sign up"
+      header: "SIGN UP"
       email_address: "Email address"
       comma_will_be_verified: ", will be verified"
       never_made_public: "never made public"
@@ -376,13 +376,13 @@ en:
 
   sessions:
     new:
-      header: "Sign in"
+      header: "SIGN IN"
       email_address: "Email address"
       password: "Password"
       openid: "OpenID"
       remember_me: "Remember me:"
-      button_signin: "Sign in"
-      or_signup: "or Sign up"
+      button_signin: "SIGN IN"
+      or_signup: "| SIGN UP"
       i_forgot_my_password: "I forgot my password!"
       login_using_openid: "Login using OpenID"
       back_to_regular_login: "Back to Regular Login"

@@ -96,7 +96,7 @@ pre {
   padding: 1em;
 }
 a:link,a:visited {
-  color: #4f4f4f;
+  color: #ff0028;
   font-weight: bold;
   text-decoration: none;
 }
@@ -107,7 +107,7 @@ p.welcome {
 }
 
 p.welcome a, p.welcome a:visited {
-  color: #4F4F4F;
+  color: #ff0028;
   text-decoration: underline;
 }
 
