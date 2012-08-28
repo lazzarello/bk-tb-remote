@@ -47,6 +47,7 @@ gem "cancan"
 gem "dalli"
 gem "redcarpet", "1.17.2"
 gem 'rails_admin'
+gem "fastercsv"
 gem "ar_after_transaction"
 
 group :development, :test do

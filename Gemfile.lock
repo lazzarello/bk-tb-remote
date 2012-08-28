@@ -98,6 +98,7 @@ GEM
       multi_json (~> 1.0)
     faraday (0.8.1)
       multipart-post (~> 1.1)
+    fastercsv (1.5.5)
     feed-normalizer (1.5.2)
       hpricot (>= 0.6)
       simple-rss (>= 1.1)
@@ -304,6 +305,7 @@ DEPENDENCIES
   dalli
   database_cleaner
   dynamic_form
+  fastercsv
   feed-normalizer
   girl_friday
   guard-spork
