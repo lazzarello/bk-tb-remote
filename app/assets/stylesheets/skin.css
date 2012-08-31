@@ -138,7 +138,52 @@ p.welcome {
   right: 0;
   text-align: right;
   top: 12px;
+}
+
+p.about-header {
+  text-align: center;
+  font-size: 35px;
   font-family: 'Quicksand', sans-serif;
+  padding: 15px;
+}
+
+p.about {
+  text-align: center;
+  font-size: 25px;
+  font-family: 'Quicksand', sans-serif;
+  padding: 55px;
+}
+
+.about-hilight {
+  color: #448ccb;
+}
+
+.concept-hilight {
+  color: #fafafc;
+}
+
+.account-hilight {
+ color: #ff0028;
+}
+
+.dashed-rule {
+  border-style: dashed;
+  margin-left: 140px;
+  margin-right: 140px;
+}
+
+#callout-wrapper {
+  text-align: center;
+}
+
+#callout {
+  right-padding: 100px;
+  left-padding: 100px;
+  font-family: Arial;
+}
+
+#concept {
+  background-color: #448ccb;
 }
 
 /* Suckerfish dropdown menu */
