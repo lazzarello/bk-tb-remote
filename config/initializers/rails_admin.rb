@@ -29,9 +29,35 @@ end
     show
     edit
     delete
+    export
   end
 
-  config.included_models = [Preference,Exchange,ForumPost,FeedPost,BroadcastEmail,Person,Category,Neighborhood,Req,Offer]
+  config.included_models = [Account, Preference,Exchange,ForumPost,FeedPost,BroadcastEmail,Person,Category,Neighborhood,Req,Offer,BusinessType,ActivityStatus,PlanType]
+
+  config.model Account do
+    list do
+      field :person do
+        label "Name"
+        formatted_value do
+          value.display_name
+        end
+      end
+      field :balance
+      field :credit_limit
+      field :updated_at do
+        label "Last Transaction"
+      end
+    end
+
+    export do
+      field :person
+      field :balance
+      field :credit_limit
+      field :updated_at do
+        label "Last Transaction"
+      end
+    end
+  end
 
   config.model Req do
     label "Request" 
@@ -39,7 +65,7 @@ end
     list do
       field :name
       field :person do
-        label "requested by"
+        label "Requested by"
         formatted_value do
           value.name
         end
@@ -63,7 +89,7 @@ end
     list do
       field :name
       field :person do
-        label "offered by"
+        label "Offered by"
         formatted_value do
           value.name
         end
@@ -97,7 +123,6 @@ end
         partial "select"
       end
       field :blog_feed_url
-      field :exception_notification
       field :new_member_notification
       field :googlemap_api_key
       field :disqus_shortname
@@ -121,20 +146,20 @@ end
     list do
       field :created_at
       field :customer do
-        label "payer"
+        label "Payer"
         formatted_value do
           value.name
         end
       end
       field :worker do
-        label "payee"
+        label "Payee"
         formatted_value do
           value.name
         end
       end
       field :amount
       field :metadata do
-        label "memo"
+        label "Memo"
         formatted_value do
           value.name
         end
@@ -205,15 +230,52 @@ end
     end
   end
 
+  config.model BusinessType do
+    list do
+      field :name
+      sort_by :name
+    end
+
+    edit do
+      field :name
+      field :description
+    end
+  end
+
+  config.model ActivityStatus do
+    list do
+      field :name
+      sort_by :name
+    end
+
+    edit do
+      field :name
+      field :description
+    end
+  end
+
+  config.model PlanType do
+    list do
+      field :name
+      sort_by :name
+    end
+
+    edit do
+      field :name
+      field :description
+    end
+  end
+
   config.model Person do
     list do
       field :last_logged_in_at do
-        label "last login"
+        label "Last login"
       end
       field :name
+      field :business_name
       field :email
       field :deactivated do
-        label "disabled"
+        label "Disabled"
       end
       field :email_verified
       field :phone
@@ -221,6 +283,30 @@ end
       field :org
       field :openid_identifier
       sort_by :last_logged_in_at
+    end
+
+    export do
+      field :last_logged_in_at do
+        label "Last login"
+      end
+      field :name
+      field :email
+      field :deactivated do
+        label "Disabled"
+      end
+      field :email_verified
+      field :phone
+      field :admin
+      field :org
+      field :web_site_url
+      field :org
+      field :title
+      field :business_name
+      field :legal_business_name
+      field :business_type 
+      field :activity_status
+      field :plan_type
+      field :support_contact
     end
 
     edit do
@@ -232,7 +318,15 @@ end
       field :email_verified
       field :phone
       field :admin
+      field :web_site_url
       field :org
+      field :title
+      field :business_name
+      field :legal_business_name
+      field :business_type
+      field :activity_status
+      field :plan_type
+      field :support_contact
       field :description, :text do
         #ckeditor true
       end

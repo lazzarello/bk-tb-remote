@@ -18,7 +18,7 @@ class TransactsController < ApplicationController
   end
 
   def user_info
-    @user_info = {'name' => current_person.name,
+    @user_info = {'name' => current_person.display_name,
                   'profile' => person_url(current_person),
                   'picture' => current_person.thumbnail,
                   'website' => current_person.openid_identifier || '',
@@ -34,7 +34,7 @@ class TransactsController < ApplicationController
       return invalid_oauth_response(401,"Bad scope")
     end
     @groups = current_person.groups.select {|g| g.opentransact?}
-    @assets = @groups.map {|g| {:name => g.asset, :url => transacts_url(:asset => g.asset), :balance => current_person.account(g).balance.to_s}}
+    @assets = @groups.map {|g| {:name => g.asset, :url => transacts_url(:asset => g.asset), :balance => current_person.account(g).balance_with_initial_offset.to_s}}
     @wallet = {'version' => '1.0',
                 'encoding' => 'UTF8',
                 'total' => @assets.length,

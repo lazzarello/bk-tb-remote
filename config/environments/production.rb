@@ -61,4 +61,8 @@ Oscurrency::Application.configure do
   config.assets.digest = true
 
   config.action_mailer.default_url_options = { :host => 'www.brooklyntimebank.org' }
+
+  # see https://github.com/sferik/rails_admin/issues/1046
+  config.assets.precompile += ['rails_admin/rails_admin.css', 'rails_admin/rails_admin.js']
+
 end

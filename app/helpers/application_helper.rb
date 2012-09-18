@@ -113,8 +113,11 @@ module ApplicationHelper
   end
 
   def markdown(text)
-    options = [:hard_wrap, :no_intraemphasis]
-    Redcarpet.new(text || "", *options).to_html.html_safe
+    markdown_parser.render(text).html_safe
+  end
+
+  def markdown_parser
+    @markdown_parser ||= Redcarpet::Markdown.new(Redcarpet::Render::HTML.new(:hard_wrap => true))
   end
 
   # Display text by sanitizing and formatting.
@@ -158,7 +161,7 @@ module ApplicationHelper
       str = ""
     else
       credit_limit = account.credit_limit.nil? ? "" : "(limit: #{account.credit_limit.to_s})"
-      action = "#{account.balance} #{account.group.unit} #{credit_limit}"
+      action = "#{account.balance_with_initial_offset} #{account.group.unit} #{credit_limit}"
       str = link_to(img,path, options)
       str << " "
       str << link_to_unless_current(action, path, options)
@@ -170,6 +173,16 @@ module ApplicationHelper
     img = image_tag("icons/switch.gif")
     path = new_person_exchange_path(person, ({:group => group.id} unless group.nil?))
     action = "Give credit"
+    str = link_to(img,path,options)
+    str << " "
+    str << link_to_unless_current(action, path, options)
+    # str.html_safe
+  end
+
+  def support_link(person, group = nil, options = {})
+    img = image_tag("icons/question.gif")
+    path = person_path(person)
+    action = t('people.show.support_contact')
     str = link_to(img,path,options)
     str << " "
     str << link_to_unless_current(action, path, options)
@@ -192,7 +205,7 @@ module ApplicationHelper
   end
 
   def first_n_words(s, n=20)
-    s[/(\s*\S+){,#{n}}/]
+    s.to_s[/(\s*\S+){,#{n}}/]
   end
 
   # Return a formatting note (depends on the presence of a Markdown library)

@@ -255,6 +255,7 @@ gr:
       header: "Ανέβασμα φωτογραφίας ομάδας"
       upload_a_photo: "Ανέβασε μια φωτογραφία:"
     show:
+      contact: "Επικοινωνία"
       header: "Ομάδα:"
       blank_description: "Η περιγραφή της ομάδας είναι κενή."
       add_description: "Πατήστε εδώ για να προσθέσετε περιγραφή"
@@ -367,6 +368,8 @@ gr:
   people:
     edit:
       header: "Επεξεργασία προφίλ"
+      business_details: "Business Details"
+      business_account: "This is a business account"
       personal_details: "Προσωπικά στοιχεία"
       name: "Όνομα"
       share_phone_number: "Κοινός αριθμός τηλεφώνου:"
@@ -393,6 +396,14 @@ gr:
       confirm_password: "Επιβεβαίωση Κωδικού Πρόσβασης"
       change_password: "Αλλαγή Κωδικού Πρόσβασης"
       change_openid: "Αλλαγή OpenID"
+      web_site_url: "URL ιστοσελίδας"
+      business_name: "Business Name"
+      legal_business_name: "Business Legal Name"
+      business_type: "Business Type"
+      title: "Your Title"
+      activity_status: "Activity Status"
+      plan_type: "Plan Type"
+      support_contact: "Support Contact"
     groups:
       no_groups: "Καμία ομάδα (ακόμη)"
       new_group: "Νέα Ομάδα"
@@ -407,6 +418,7 @@ gr:
       no_invitations: "Καμία Πρόσκληση (ακόμη)"
     new:
       header: "Εγγραφή"
+      business_account: "This is a business account"
       email_address: "Ηλεκτρονική διεύθυνση"
       comma_will_be_verified: ", θα επαληθευτεί"
       never_made_public: "ποτέ δεν θα εμφανίζεται"
@@ -430,6 +442,7 @@ gr:
       no_membership_request: "Καμία αίτηση συμμετοχής (ακόμη)"
     show:
       header: "Προφίλ"
+      support_contact: "Support Contact"
       organization_profile: "Αυτό είναι προφίλ οργανισμού"
       not_active: "Αυτό το πρόσωπο δεν είναι ενεργό"
       description_blank: "Η περιγραφή σας είναι κενή."
@@ -780,6 +793,7 @@ gr:
   success_connection_ended: "Τερματίστηκε επιτυχώς η σύνδεση με"
   success_password_updated: "Ο κωδικός πρόσβασης ενημερώθηκε."
   success_credit_limit_updated: "Το πιστωτικό όριο ενημερώθηκε"
+  success_account_updated: "Account updated"
 
   error_geocoding_failed: "Η Γεωκωδικοποίηση απέτυχε"
   error_at_least_one_address: "Πρέπει να έχετε τουλάχιστον μία διεύθυνση"
@@ -820,6 +834,7 @@ gr:
   error_could_not_find_payee: "δεν βρέθηκε ο αμοιβόμενος"
   error_with_transfer: "Σφάλμα με την μεταφορά."
   error_credit_limit_update_failed: "Η ενημέρωση του πιστωτικού ορίου απέτυχε!"
+  error_account_update_failed: "Account update failed"
   error_connection_request_invadid_or_expired: "Η αίτηση σύνδεσης δεν είναι έγκυρη ή έχει λήξει"
   error_connection_request_person_deactivated: "Μη έγκυρη αίτηση σύνδεσης: το πρόσωπο είναι απενεργοποιημένο"
   error_email_not_found: "Δεν βρέθηκε κανένας με αυτήν την διεύθυνση email"

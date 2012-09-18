@@ -15,6 +15,22 @@ class Ability
     can :update, Person do |target_person|
       target_person == person || person.admin?
     end
+    can :export, Person
+
+    can :read, BusinessType
+    can [:create,:update,:destroy], BusinessType do |bt|
+      person.admin?
+    end
+
+    can :read, ActivityStatus
+    can [:create,:update,:destroy], ActivityStatus do |as|
+      person.admin?
+    end
+
+    can :read, PlanType
+    can [:create,:update,:destroy], PlanType do |pt|
+      person.admin?
+    end
 
     can :read, FeedPost
     can [:update,:destroy], FeedPost do |post|
@@ -85,6 +101,8 @@ class Ability
     can :update, Account do |account|
       person.is?(:admin,account.group)
     end
+    can :export, Account
+
 
     can :read, Offer
     can :create, Offer do |offer|
